@@ -1,0 +1,26 @@
+{
+  "name": "resona-marketplace",
+  "version": "1.0.0",
+  "description": "💼 Resona Marketplace",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Resona-Music/marketplace.git"
+  },
+  "keywords": [],
+  "author": "Resona Music",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Resona-Music/marketplace/issues"
+  },
+  "homepage": "https://github.com/Resona-Music/marketplace#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0"
+  }
+}
