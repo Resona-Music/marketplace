@@ -1,37 +1,43 @@
 {
-  "name": "resona-marketplace",
-  "version": "1.0.0",
-  "description": "💼 Resona Marketplace",
-  "type": "module",
-  "main": "index.js",
-  "scripts": {
-    "dev": "node --watch src/index.js",
-    "start": "node src/index.js",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Resona-Music/marketplace.git"
-  },
-  "keywords": [],
-  "author": "Resona Music",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Resona-Music/marketplace/issues"
-  },
-  "homepage": "https://github.com/Resona-Music/marketplace#readme",
-  "dependencies": {
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.39.0",
-    "eslint": "^9.39.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.4",
-    "prettier": "^3.6.2"
-  }
+    "name": "resona-marketplace",
+    "version": "1.0.0",
+    "description": "💼 Resona Marketplace",
+    "type": "module",
+    "main": "index.js",
+    "scripts": {
+        "dev": "node --watch src/index.js",
+        "start": "node src/index.js",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "db:generate": "drizzle-kit generate",
+        "db:migrate": "drizzle-kit migrate",
+        "db:studio": "drizzle-kit studio"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Resona-Music/marketplace.git"
+    },
+    "keywords": [],
+    "author": "Resona Music",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Resona-Music/marketplace/issues"
+    },
+    "homepage": "https://github.com/Resona-Music/marketplace#readme",
+    "dependencies": {
+        "@neondatabase/serverless": "^1.0.2",
+        "dotenv": "^17.2.3",
+        "drizzle-orm": "^0.44.7",
+        "express": "^5.1.0"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.39.0",
+        "drizzle-kit": "^0.31.6",
+        "eslint": "^9.39.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-prettier": "^5.5.4",
+        "prettier": "^3.6.2"
+    }
 }
