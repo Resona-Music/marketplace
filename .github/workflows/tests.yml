@@ -1,0 +1,98 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main, staging]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: test
+      NODE_OPTIONS: '--experimental-vm-modules'
+      DATABASE_URL: postgresql://resona:resona@localhost:5432/resona_test
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: resona
+          POSTGRES_PASSWORD: resona
+          POSTGRES_DB: resona_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U resona -d resona_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        id: tests
+        run: npm test -- --ci --reporters=default --reporters=jest-junit 2>&1 | tee test-output.txt
+        continue-on-error: true
+        env:
+          JEST_JUNIT_OUTPUT_DIR: ./reports
+          JEST_JUNIT_OUTPUT_NAME: junit.xml
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
+
+      - name: Generate step summary
+        if: always()
+        run: |
+          echo "## Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.tests.outcome }}" == "success" ]; then
+            echo ":white_check_mark: **All tests passed**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo ":x: **Some tests failed**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "### Coverage Summary" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Metric | Coverage |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|----------|" >> $GITHUB_STEP_SUMMARY
+
+            STATEMENTS=$(node -e "const c = require('./coverage/coverage-summary.json'); console.log(c.total.statements.pct + '%')")
+            BRANCHES=$(node -e "const c = require('./coverage/coverage-summary.json'); console.log(c.total.branches.pct + '%')")
+            FUNCTIONS=$(node -e "const c = require('./coverage/coverage-summary.json'); console.log(c.total.functions.pct + '%')")
+            LINES=$(node -e "const c = require('./coverage/coverage-summary.json'); console.log(c.total.lines.pct + '%')")
+
+            echo "| Statements | $STATEMENTS |" >> $GITHUB_STEP_SUMMARY
+            echo "| Branches | $BRANCHES |" >> $GITHUB_STEP_SUMMARY
+            echo "| Functions | $FUNCTIONS |" >> $GITHUB_STEP_SUMMARY
+            echo "| Lines | $LINES |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Annotate test failures
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "::error::Tests failed. Review the test output above for details."
+          exit 1

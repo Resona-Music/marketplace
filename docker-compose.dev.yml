@@ -1,0 +1,66 @@
+services:
+  # Neon Local Database Proxy
+  neon-local:
+    image: neondatabase/neon_local:latest
+    container_name: neon-local
+    ports:
+      - '5434:5432'
+    env_file:
+      - .env.development
+    volumes:
+      # Optional: Persist branches per Git branch
+      - ./.neon_local/:/tmp/.neon_local
+      - ./.git/HEAD:/tmp/.git/HEAD:ro,consistent
+    networks:
+      - marketplace-development
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-h', 'localhost', '-p', '5432', '-U', 'neon']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Application Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: marketplace-api-dev
+    ports:
+      - '5500:5500'
+    env_file:
+      - .env.development
+    volumes:
+      # Mount source code for hot reload
+      - ./src:/app/src:ro
+      - ./scripts:/app/scripts:ro
+      - ./drizzle:/app/drizzle:ro
+      - ./drizzle.config.ts:/app/drizzle.config.ts:ro
+      - ./package.json:/app/package.json:ro
+      # Exclude node_modules to prevent conflicts
+      - /app/node_modules
+    networks:
+      - marketplace-development
+    depends_on:
+      neon-local:
+        condition: service_healthy
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "const http = require('http'); const req = http.request({hostname: 'localhost', port: 5500, path: '/health', headers: {'User-Agent': 'Docker-Healthcheck'}}, (res) => process.exit(res.statusCode === 200 ? 0 : 1)); req.on('error', () => process.exit(1)); req.end();",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  marketplace-development:
+    driver: bridge

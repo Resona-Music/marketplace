@@ -1,0 +1,41 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+
+# ENV
+.env
+.env.local
+.env.production
+.env.development
+.env.test
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose*.yml
+
+# Dev tools
+.vscode
+.idea
+*.swp
+*.swo
+
+# Tests
+tests
+coverage
+
+# Neon local data
+.neon_local
+
+# Scripts
+scripts
