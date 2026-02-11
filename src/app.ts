@@ -15,7 +15,11 @@ app.use(cors({ origin: ['http://localhost:5500'], credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(morgan('combined', { stream: { write: (message: string) => logger.info(message.trim() )}}));
+app.use(
+  morgan('combined', {
+    stream: { write: (message: string) => logger.info(message.trim()) },
+  })
+);
 app.use(securityMiddleware);
 
 app.get('/', (_req: Request, res: Response) => {
@@ -39,7 +43,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
 
 app.use((_req, res) => {
-  res.status(404).json({ error: "Route not found" })
-})
+  res.status(404).json({ error: 'Route not found' });
+});
 
 export default app;

@@ -17,8 +17,17 @@ import {
 import { cookies } from '#utils/cookies.js';
 import { formatValidationError } from '#utils/format.js';
 import { accessToken, refreshToken } from '#utils/jwt.js';
-import { registerSchema, loginSchema, verifyEmailSchema, forgotPasswordResetSchema, resetPasswordSchema } from '#validations/auth.validations.js';
-import { sendPasswordResetEmail, sendVerificationEmail } from '#services/email.service.js';
+import {
+  registerSchema,
+  loginSchema,
+  verifyEmailSchema,
+  forgotPasswordResetSchema,
+  resetPasswordSchema,
+} from '#validations/auth.validations.js';
+import {
+  sendPasswordResetEmail,
+  sendVerificationEmail,
+} from '#services/email.service.js';
 
 export const register = async (
   req: Request,
@@ -38,11 +47,17 @@ export const register = async (
 
     const user = await createUser(validation.data);
 
-    const verificationToken = await createVerificationToken(user.id, "email_verify");
+    const verificationToken = await createVerificationToken(
+      user.id,
+      'email_verify'
+    );
     try {
       await sendVerificationEmail(user.email, verificationToken);
     } catch (emailError) {
-      logger.warn(`Failed to send verification email to ${user.email}`, emailError);
+      logger.warn(
+        `Failed to send verification email to ${user.email}`,
+        emailError
+      );
     }
 
     const access = accessToken.sign({
@@ -61,7 +76,7 @@ export const register = async (
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 15 * 60 * 1000, // 15 minutes
-      path: '/'
+      path: '/',
     });
 
     cookies.set(res, 'refreshToken', refresh, {
@@ -69,7 +84,7 @@ export const register = async (
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: '/api/auth'
+      path: '/api/auth',
     });
 
     logger.info(`User registered successfully: ${user.email}`);
@@ -127,7 +142,7 @@ export const login = async (
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 15 * 60 * 1000, // 15 minutes
-      path: '/'
+      path: '/',
     });
 
     cookies.set(res, 'refreshToken', refresh, {
@@ -135,7 +150,7 @@ export const login = async (
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: '/api/auth'
+      path: '/api/auth',
     });
 
     logger.info(`User logged in successfully: ${user.email}`);
@@ -183,7 +198,11 @@ export const logout = async (
   }
 };
 
-export const refresh = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const refresh = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const token = req.cookies.refreshToken;
     if (!token) {
@@ -219,9 +238,9 @@ export const refresh = async (req: Request, res: Response, next: NextFunction): 
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 15 * 60 * 1000, // 15 minutes
-      path: '/'
+      path: '/',
     });
-    
+
     logger.info(`Access token refreshed for user: ${user.email}`);
     res.status(200).json({
       message: 'Access token refreshed',
@@ -230,9 +249,13 @@ export const refresh = async (req: Request, res: Response, next: NextFunction): 
     logger.error('Refresh token error', error);
     next(error);
   }
-}
+};
 
-export const verifyEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const verifyEmail = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const validation = verifyEmailSchema.safeParse(req.body);
 
@@ -244,7 +267,7 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
       return;
     }
 
-    const result = await verifyToken(validation.data.token, "email_verify");
+    const result = await verifyToken(validation.data.token, 'email_verify');
 
     if (!result) {
       res.status(400).json({ error: 'Invalid or expired token' });
@@ -261,9 +284,13 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
     logger.error('Email verification error', error);
     next(error);
   }
-}
+};
 
-export const resendVerification = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const resendVerification = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const accessTokenCookie = req.cookies.accessToken;
 
@@ -280,12 +307,15 @@ export const resendVerification = async (req: Request, res: Response, next: Next
       return;
     }
 
-    const token = await createVerificationToken(user.id, "email_verify");
+    const token = await createVerificationToken(user.id, 'email_verify');
     try {
       await sendVerificationEmail(user.email, token);
       logger.info(`Verification email resent to: ${user.email}`);
     } catch (emailError) {
-      logger.warn(`Failed to resend verification email to ${user.email}`, emailError);
+      logger.warn(
+        `Failed to resend verification email to ${user.email}`,
+        emailError
+      );
     }
     res.status(200).json({
       message: 'Verification email resent',
@@ -294,9 +324,13 @@ export const resendVerification = async (req: Request, res: Response, next: Next
     logger.error('Resend verification email error', error);
     next(error);
   }
-}
+};
 
-export const forgotPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const forgotPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const validation = forgotPasswordResetSchema.safeParse(req.body);
 
@@ -310,16 +344,21 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
 
     const user = await getUserByEmail(validation.data.email);
     if (!user) {
-      res.status(200).json({ error: 'If that email exists, a reset link was sent' });
+      res
+        .status(200)
+        .json({ error: 'If that email exists, a reset link was sent' });
       return;
     }
 
-    const token = await createVerificationToken(user.id, "password_reset");
+    const token = await createVerificationToken(user.id, 'password_reset');
     try {
       await sendPasswordResetEmail(user.email, token);
       logger.info(`Password reset email sent to: ${user.email}`);
     } catch (emailError) {
-      logger.warn(`Failed to send password reset email to ${user.email}`, emailError);
+      logger.warn(
+        `Failed to send password reset email to ${user.email}`,
+        emailError
+      );
     }
     res.status(200).json({
       message: 'If that email exists, a reset link was sent',
@@ -328,12 +367,16 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
     logger.error('Forgot password error', error);
     next(error);
   }
-}
+};
 
-export const resetPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const resetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const validation = resetPasswordSchema.safeParse(req.body);
-    
+
     if (!validation.success) {
       res.status(400).json({
         error: 'Validation failed',
@@ -342,7 +385,7 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
       return;
     }
 
-    const result = await verifyToken(validation.data.token, "password_reset");
+    const result = await verifyToken(validation.data.token, 'password_reset');
 
     if (!result) {
       res.status(400).json({ error: 'Invalid or expired token' });
@@ -360,4 +403,4 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
     logger.error('Reset password error', error);
     next(error);
   }
-}
+};

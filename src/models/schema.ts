@@ -1,4 +1,10 @@
-import { pgTable, timestamp, serial, varchar, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  timestamp,
+  serial,
+  varchar,
+  integer,
+} from 'drizzle-orm/pg-core';
 import { InferSelectModel, InferInsertModel } from 'drizzle-orm';
 
 export const users = pgTable('users', {
@@ -15,7 +21,9 @@ export const users = pgTable('users', {
 
 export const refreshTokens = pgTable('refreshTokens', {
   id: serial('id').primaryKey(),
-  userId: integer('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: integer('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   tokenHash: varchar('tokenHash', { length: 64 }).notNull().unique(),
   expiresAt: timestamp('expiresAt').notNull(),
   revokedAt: timestamp('revokedAt'),
@@ -24,7 +32,9 @@ export const refreshTokens = pgTable('refreshTokens', {
 
 export const verificationTokens = pgTable('verification_tokens', {
   id: serial('id').primaryKey(),
-  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   token: varchar('token', { length: 64 }).notNull().unique(),
   type: varchar('type', { length: 20 }).notNull(), // 'email_verify' or 'password_reset'
   expiresAt: timestamp('expires_at').notNull(),

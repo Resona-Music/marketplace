@@ -29,7 +29,9 @@ export type RefreshTokenPayload = {
 export const accessToken = {
   sign: (payload: Omit<AccessTokenPayload, 'type'>): string => {
     try {
-      return jwt.sign({...payload, type: 'access'}, JWT_ACCESS_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN } as any);
+      return jwt.sign({ ...payload, type: 'access' }, JWT_ACCESS_SECRET, {
+        expiresIn: ACCESS_TOKEN_EXPIRES_IN,
+      } as any);
     } catch (error) {
       logger.error('Failed to sign JWT token', error);
       throw new Error('Failed to authenticate token');
@@ -37,11 +39,14 @@ export const accessToken = {
   },
   verify: (token: string): AccessTokenPayload => {
     try {
-      const decoded = jwt.verify(token, JWT_ACCESS_SECRET) as AccessTokenPayload;
+      const decoded = jwt.verify(
+        token,
+        JWT_ACCESS_SECRET
+      ) as AccessTokenPayload;
       if (decoded.type !== 'access') {
         throw new Error('Invalid token type');
       }
-      return decoded
+      return decoded;
     } catch (error) {
       logger.error('Failed to verify JWT token', error);
       throw new Error('Failed to authenticate token');
@@ -52,7 +57,9 @@ export const accessToken = {
 export const refreshToken = {
   sign: (userId: number): string => {
     try {
-      return jwt.sign({ userId, type: 'refresh' }, JWT_REFRESH_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN } as any);
+      return jwt.sign({ userId, type: 'refresh' }, JWT_REFRESH_SECRET, {
+        expiresIn: REFRESH_TOKEN_EXPIRES_IN,
+      } as any);
     } catch (error) {
       logger.error('Failed to sign refresh JWT token', error);
       throw new Error('Failed to authenticate token');
@@ -60,7 +67,10 @@ export const refreshToken = {
   },
   verify: (token: string): RefreshTokenPayload => {
     try {
-      const decoded = jwt.verify(token, JWT_REFRESH_SECRET) as RefreshTokenPayload;
+      const decoded = jwt.verify(
+        token,
+        JWT_REFRESH_SECRET
+      ) as RefreshTokenPayload;
       if (decoded.type !== 'refresh') {
         throw new Error('Invalid token type');
       }

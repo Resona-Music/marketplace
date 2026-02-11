@@ -11,41 +11,47 @@ interface UpdateUserParams {
 
 export const getAllUsers = async () => {
   try {
-    return await db.select({
-      id: users.id,
-      email: users.email,
-      emailVerified: users.emailVerified,
-      fullName: users.fullName,
-      username: users.username,
-      role: users.role,
-      createdAt: users.createdAt,
-      updatedAt: users.updatedAt
-    }).from(users)
+    return await db
+      .select({
+        id: users.id,
+        email: users.email,
+        emailVerified: users.emailVerified,
+        fullName: users.fullName,
+        username: users.username,
+        role: users.role,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+      })
+      .from(users);
   } catch (error) {
-    logger.error(error)
-    throw error
+    logger.error(error);
+    throw error;
   }
-}
+};
 
 export const getUserById = async (id: number) => {
   try {
-    const [user] = await db.select({
-      id: users.id,
-      email: users.email,
-      emailVerified: users.emailVerified,
-      fullName: users.fullName,
-      username: users.username,
-      role: users.role,
-      createdAt: users.createdAt,
-      updatedAt: users.updatedAt
-    }).from(users).where(eq(users.id, id)).limit(1);
+    const [user] = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        emailVerified: users.emailVerified,
+        fullName: users.fullName,
+        username: users.username,
+        role: users.role,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+      })
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
 
     return user || null;
   } catch (error) {
     logger.error('Error getting user by ID:', error);
     throw error;
   }
-}
+};
 
 export const updateUser = async (
   userId: number,
@@ -105,10 +111,10 @@ export const updateUser = async (
 };
 
 export const deleteUser = async (userId: number): Promise<void> => {
-    try {
-        await db.delete(users).where(eq(users.id, userId));
-    } catch (error) {
-        logger.error('Error deleting user:', error);
-        throw error;
-    }
+  try {
+    await db.delete(users).where(eq(users.id, userId));
+  } catch (error) {
+    logger.error('Error deleting user:', error);
+    throw error;
+  }
 };

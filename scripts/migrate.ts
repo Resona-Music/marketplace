@@ -13,7 +13,7 @@ neonConfig.webSocketConstructor = ws;
 
 // Configure for neon-local in development (Envoy proxy on port 5432)
 if (process.env.NODE_ENV === 'development') {
-  neonConfig.wsProxy = (host) => `${host}:5432/v2`;
+  neonConfig.wsProxy = host => `${host}:5432/v2`;
   neonConfig.useSecureWebSocket = false;
   neonConfig.pipelineTLS = false;
   neonConfig.pipelineConnect = false;

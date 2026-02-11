@@ -30,7 +30,7 @@ export const comparePassword = async (
 
 export const hashToken = (token: string): string => {
   try {
-    return crypto.createHash("sha256").update(token).digest("hex");
+    return crypto.createHash('sha256').update(token).digest('hex');
   } catch (error) {
     logger.error(`Error hashing token: ${error}`);
     throw new Error('Error hashing token');
@@ -51,7 +51,12 @@ export const createUser = async ({
   username,
   email,
   password,
-}: { fullName: string; username: string; email: string; password: string }): Promise<UserResponse> => {
+}: {
+  fullName: string;
+  username: string;
+  email: string;
+  password: string;
+}): Promise<UserResponse> => {
   try {
     const existingUser = await db
       .select()
@@ -97,7 +102,10 @@ export const createUser = async ({
 export const authenticateUser = async ({
   email,
   password,
-}: { email: string; password: string }): Promise<UserResponse> => {
+}: {
+  email: string;
+  password: string;
+}): Promise<UserResponse> => {
   try {
     const [user] = await db
       .select()
@@ -166,17 +174,15 @@ export const validateRefreshToken = async (
         )
       )
       .limit(1);
-    
-      return !!storedToken;
+
+    return !!storedToken;
   } catch (error) {
     logger.error(`Error validating refresh token: ${error}`);
     throw new Error('Error validating refresh token');
   }
 };
 
-export const revokeRefreshToken = async (
-  token: string
-): Promise<void> => {
+export const revokeRefreshToken = async (token: string): Promise<void> => {
   try {
     const tokenHash = hashToken(token);
 
@@ -198,10 +204,7 @@ export const revokeAllRefreshTokensForUser = async (
       .update(refreshTokens)
       .set({ revokedAt: new Date() })
       .where(
-        and(
-          eq(refreshTokens.userId, userId),
-          isNull(refreshTokens.revokedAt)
-        )
+        and(eq(refreshTokens.userId, userId), isNull(refreshTokens.revokedAt))
       );
   } catch (error) {
     logger.error(`Error revoking all refresh tokens for user: ${error}`);
@@ -209,7 +212,9 @@ export const revokeAllRefreshTokensForUser = async (
   }
 };
 
-export const getUserById = async (userId: number): Promise<UserResponse | null> => {
+export const getUserById = async (
+  userId: number
+): Promise<UserResponse | null> => {
   try {
     const [user] = await db
       .select({
@@ -235,7 +240,10 @@ export const generateToken = (): string => {
   return crypto.randomBytes(32).toString('hex');
 };
 
-export const createVerificationToken = async (userId: number, type: 'email_verify' | 'password_reset'): Promise<string> => {
+export const createVerificationToken = async (
+  userId: number,
+  type: 'email_verify' | 'password_reset'
+): Promise<string> => {
   try {
     const token = generateToken();
     const expiresAt = new Date();
@@ -253,14 +261,17 @@ export const createVerificationToken = async (userId: number, type: 'email_verif
       expiresAt,
     });
 
-    return token
+    return token;
   } catch (error) {
     logger.error(`Error creating verification token: ${error}`);
     throw new Error('Error creating verification token');
   }
 };
 
-export const verifyToken = async (token: string, type: 'email_verify' | 'password_reset'): Promise<{ userId: number } | null> => {
+export const verifyToken = async (
+  token: string,
+  type: 'email_verify' | 'password_reset'
+): Promise<{ userId: number } | null> => {
   try {
     const [found] = await db
       .select()
@@ -269,7 +280,7 @@ export const verifyToken = async (token: string, type: 'email_verify' | 'passwor
         and(
           eq(verificationTokens.token, token),
           eq(verificationTokens.type, type),
-          isNull(verificationTokens.usedAt),
+          isNull(verificationTokens.usedAt)
         )
       )
       .limit(1);
@@ -315,7 +326,9 @@ export const updatePassword = async (userId: number, newPassword: string) => {
   }
 };
 
-export const getUserByEmail = async (email: string): Promise<UserResponse | null> => {
+export const getUserByEmail = async (
+  email: string
+): Promise<UserResponse | null> => {
   try {
     const [user] = await db
       .select({

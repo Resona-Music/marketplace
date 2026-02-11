@@ -9,7 +9,7 @@ neonConfig.webSocketConstructor = ws;
 // drizzle-kit uses @neondatabase/serverless Pool (WebSocket) for migrations.
 // In development with neon-local, Envoy multiplexes all traffic on port 5432.
 if (process.env.NODE_ENV === 'development') {
-  neonConfig.wsProxy = (host) => `${host}:5432/v2`;
+  neonConfig.wsProxy = host => `${host}:5432/v2`;
   neonConfig.useSecureWebSocket = false;
   neonConfig.pipelineTLS = false;
   neonConfig.pipelineConnect = false;
