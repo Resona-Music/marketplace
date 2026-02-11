@@ -28,7 +28,7 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction): vo
     }
 };
 
-export const optionalAuth = (req: Request, res: Response, next: NextFunction): void => {
+export const optionalAuth = (req: Request, _res: Response, next: NextFunction): void => {
     try {
         const token = req.cookies.accessToken;
 
